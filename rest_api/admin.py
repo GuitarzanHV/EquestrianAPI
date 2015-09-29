@@ -1,8 +1,5 @@
 from django.contrib import admin
-from .models import Questionnaire
-from .models import Category
-from .models import Question
-from .models import Answer
+from .models import Questionnaire, Category, Question, Answer
 
 # Register your models here.
 admin.site.register(Questionnaire)
