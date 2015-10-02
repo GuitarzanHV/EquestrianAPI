@@ -1,6 +1,5 @@
 from django.db import models
 
-# Create your models here.
 class Questionnaire(models.Model):
     """Lists the categories for each questionnaire type, as
     well as the maximum composite score for each score type
