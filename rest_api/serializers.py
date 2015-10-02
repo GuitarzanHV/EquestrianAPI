@@ -2,25 +2,33 @@ from rest_framework import serializers
 from .models import Questionnaire, Category, Question, Answer
 
 class QuestionnaireSerializer(serializers.ModelSerializer):
-    """docstring for ClassName"""
+    """Prepare Questionnaires for conversion to JSON"""
+    categories = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Questionnaire
-        fields = ('id', 'questionnaire_name', 'acceptable_score', 'needs_work_score', 'unacceptable_score')
+        fields = ('id', 'questionnaire_name', 'needs_work_score', 
+            'unacceptable_score', 'categories')
 
 class CategorySerializer(serializers.ModelSerializer):
-    """docstring"""
+    """Prepare Catgories for conversion to JSON"""
+    questions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Category
-        fields = ('id', 'category_name', 'acceptable_score', 'needs_work_score', 'unacceptable_score', 'questionnaires')
+        fields = ('id', 'category_name', 'needs_work_score', 
+            'unacceptable_score', 'questionnaires', 'questions')
 
 class QuestionSerializer(serializers.ModelSerializer):
-    """docstring"""
+    """Prepare Questions for conversion to JSON"""
+    answers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
     class Meta:
         model = Question
-        fields = ('id', 'question_text', 'question_image', 'categories')
+        fields = ('id', 'question_text', 'question_image', 'categories', 'answers')
 
 class AnswerSerializer(serializers.ModelSerializer):
-    """docstring"""
+    """Prepare Answers for conversion to JSON"""
     class Meta:
         model = Answer
         fields = ('id', 'answer_text', 'score', 'question')

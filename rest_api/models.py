@@ -6,7 +6,6 @@ class Questionnaire(models.Model):
     well as the maximum composite score for each score type
     """
     questionnaire_name = models.CharField(max_length=255)
-    acceptable_score = models.IntegerField(default=0)
     needs_work_score = models.IntegerField(default=0)
     unacceptable_score = models.IntegerField(default=0)
 
@@ -19,10 +18,9 @@ class Category(models.Model):
     relationships with Question and Questionnaire.
     """
     category_name = models.CharField(max_length=255)
-    acceptable_score = models.IntegerField(default=0)
     needs_work_score = models.IntegerField(default=0)
     unacceptable_score = models.IntegerField(default=0)
-    questionnaires = models.ManyToManyField(Questionnaire)
+    questionnaires = models.ManyToManyField(Questionnaire, related_name='categories')
 
     def __str__(self):
         return self.category_name
@@ -34,17 +32,18 @@ class Question(models.Model):
     """
     question_text = models.CharField(max_length=255)
     question_image = models.CharField(max_length=255)
-    categories = models.ManyToManyField(Category)
+    categories = models.ManyToManyField(Category, related_name='questions')
 
     def __str__(self):
         return self.question_text
 
 class Answer(models.Model):
     """Text and numeric score for an Answer to a 
-    Question. Each Answer only has one Question."""
+    Question. Each Answer only has one Question.
+    """
     answer_text = models.CharField(max_length=255)
     score = models.IntegerField(default=0)
-    question = models.ForeignKey(Question)
+    question = models.ForeignKey(Question, related_name='answers')
 
     def __str__(self):
         return self.answer_text
