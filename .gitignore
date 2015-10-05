@@ -1,3 +1,5 @@
 #ignore compiled python files
 *.pyc
 ./rest_api/migrations/*
+manage.py
+./EquestrianAPI/wsgi.py
