@@ -1,4 +1,4 @@
-from .models import Questionnaire, Category, Question, Answer
+from .models import Questionnaire, Category, Question, AnswerGroup, Answer
 from .serializers import QuestionnaireSerializer, CategorySerializer, QuestionSerializer, AnswerGroupSerializer, AnswerSerializer
 from rest_framework import generics
 from rest_framework.decorators import api_view
