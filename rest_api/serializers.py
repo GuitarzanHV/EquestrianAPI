@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Questionnaire, Category, Question, Answer
+from .models import Questionnaire, Category, Question, AnswerGroup, Answer
 
 class QuestionnaireSerializer(serializers.ModelSerializer):
     """Prepare Questionnaires for conversion to JSON"""
