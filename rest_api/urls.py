@@ -8,5 +8,6 @@ urlpatterns = format_suffix_patterns([
     url(r'^questionnaire/(?P<pk>[0-9]+)/$', views.QuestionnaireDetail.as_view(), name='questionnaire-detail'),
     url(r'^category/(?P<pk>[0-9]+)/$', views.CategoryDetail.as_view(), name='category-detail'),
     url(r'^question/(?P<pk>[0-9]+)/$', views.QuestionDetail.as_view(), name='question-detail'),
+    url(r'^answer_group/(?P<pk>[0-9]+)/$', views.AnswerGroupDetail.as_view(), name='answer-group-detail'),
     url(r'^answer/(?P<pk>[0-9]+)/$', views.AnswerDetail.as_view(), name='answer-detail'),
 ])

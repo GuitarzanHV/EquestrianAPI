@@ -21,15 +21,23 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class QuestionSerializer(serializers.ModelSerializer):
     """Prepare Questions for conversion to JSON"""
-    answers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    answer_groups = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Question
-        fields = ('id', 'question_text', 'question_image', 'categories', 'answers')
+        fields = ('id', 'question_text', 'question_image', 'categories', 'answer_groups')
+
+class AnswerGroupSerializer(serializers.ModelSerializer):
+    """Prepare AnswerGroups for conversion to JSON"""
+    answers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = AnswerGroup
+        fields = ('id', 'answer_group_name', 'question', 'answers')
 
 class AnswerSerializer(serializers.ModelSerializer):
     """Prepare Answers for conversion to JSON"""
     class Meta:
         model = Answer
-        fields = ('id', 'answer_text', 'score', 'question')
+        fields = ('id', 'answer_text', 'score', 'answer_groups')
         
