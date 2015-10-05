@@ -27,6 +27,10 @@ class QuestionDetail(generics.RetrieveAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
 
+class AnswerGroupDetail(generics.RetrieveAPIView):
+    queryset = AnswerGroup.objects.all()
+    serializer_class = AnswerGroupSerializer
+
 class AnswerDetail(generics.RetrieveAPIView):
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
