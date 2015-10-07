@@ -29,22 +29,13 @@ class Question(models.Model):
     that goes with the question. Multiple AnswerGroups for each
     Question, Questions can be in more than one Category
     """
+    question_name = models.CharField(max_length=255)
     question_text = models.CharField(max_length=255)
     question_image = models.CharField(max_length=255)
     categories = models.ManyToManyField(Category, related_name='questions')
 
     def __str__(self):
-        return self.question_text
-
-class AnswerGroup(models.Model):
-    """Groups together related answers, e.g. a Question Gait
-    will have an AnswerGroup on the Rhythm answers. AnswerGroups 
-    are related to one Question."""
-    answer_group_name = models.CharField(max_length=255)
-    question = models.ForeignKey(Question, related_name='answer_groups')
-
-    def __str__(self):
-        return self.answer_group_name
+        return self.question_name
 
 class Answer(models.Model):
     """Text and numeric score for an Answer to a 
@@ -52,7 +43,7 @@ class Answer(models.Model):
     """
     answer_text = models.CharField(max_length=255)
     score = models.IntegerField(default=0)
-    answer_group = models.ForeignKey(AnswerGroup, related_name='answers')
+    question = models.ForeignKey(Question, related_name='answers')
 
     def __str__(self):
         return self.answer_text
