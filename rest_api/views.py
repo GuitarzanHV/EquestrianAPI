@@ -1,5 +1,5 @@
 from .models import Questionnaire, Category, Question, AnswerGroup, Answer
-from .serializers import QuestionnaireSerializer, CategorySerializer, QuestionSerializer, AnswerGroupSerializer, AnswerSerializer
+from .serializers import QuestionnaireSerializer, CategorySerializer, QuestionSerializer, AnswerSerializer
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -26,10 +26,6 @@ class CategoryDetail(generics.RetrieveAPIView):
 class QuestionDetail(generics.RetrieveAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
-
-class AnswerGroupDetail(generics.RetrieveAPIView):
-    queryset = AnswerGroup.objects.all()
-    serializer_class = AnswerGroupSerializer
 
 class AnswerDetail(generics.RetrieveAPIView):
     queryset = Answer.objects.all()
