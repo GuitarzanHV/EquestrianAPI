@@ -1,5 +1,5 @@
-from rest_framework import serializers
-from .models import Questionnaire, Category, Question, Answer
+from rest_framework import serializers 
+from .models import *
 
 class QuestionnaireSerializer(serializers.ModelSerializer):
     """Prepare Questionnaires for conversion to JSON"""
@@ -32,4 +32,28 @@ class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Answer
         fields = ('id', 'answer_text', 'score', 'questions')
+
+class QuestionnaireScoreSerializer(serializers.ModelSerializer):
+    """Prepare Horses for conversion to JSON"""
+    category_scores = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    score = serializers.IntegerField(default=category_score_total(), read_only=True)
+
+    class Meta:
+        model = Horse
+        fields = ('id', 'name', 'score', 'owner', 'questionnaire', 'category_scores')
+
+class CategoryScoreSerializer(serializers.ModelSerializer):
+    """Prepare CategoryScores for conversion to JSON"""
+    question_scores = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    score = serializers.IntegerField(default=question_score_total(), read_only=True)
+
+    class Meta:
+        model = CategoryScore
+        fields = ('id', 'score', 'category', 'questionnaire_score', 'question_scores')
+
+class QuestionScoreSerializer(serializers.ModelSerializer):
+    """Prepare QuestionScores for conversion to JSON"""
+    class Meta:
+        model = QuestionScore
+        fields = ('id', 'score', 'question', 'answer', 'category_score')
         
