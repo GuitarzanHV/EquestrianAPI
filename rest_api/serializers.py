@@ -7,17 +7,25 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Questionnaire
-        fields = ('id', 'questionnaire_name', 'needs_work_score', 
-            'unacceptable_score', 'categories')
+        fields = ('id', 'name', 'display_text', 'needs_work_score', 
+                    'unacceptable_score', 'categories')
 
 class CategorySerializer(serializers.ModelSerializer):
     """Prepare Catgories for conversion to JSON"""
-    questions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    subcategories = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Category
-        fields = ('id', 'category_name', 'needs_work_score', 
-            'unacceptable_score', 'questionnaires', 'questions')
+        fields = ('id', 'name', 'display_text', 'needs_work_score', 
+                    'unacceptable_score', 'questionnaires', 'questions')
+
+class SubcategorySerializer(serializers.ModelSerializer):
+    """Prepare Subcategories for JSON"""
+    questions = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
+    class Meta:
+        model = Subcategory
+        fields = ('id', 'name', 'display_text', 'categories', 'questions')
 
 class QuestionSerializer(serializers.ModelSerializer):
     """Prepare Questions for conversion to JSON"""
@@ -25,7 +33,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ('id', 'question_name', 'question_text', 'question_image', 'categories', 'answers')
+        fields = ('id', 'name', 'display_text', 'question_image', 'subcategories', 'answers')
 
 class AnswerSerializer(serializers.ModelSerializer):
     """Prepare Answers for conversion to JSON"""
@@ -36,16 +44,15 @@ class AnswerSerializer(serializers.ModelSerializer):
 class QuestionnaireScoreSerializer(serializers.ModelSerializer):
     """Prepare Horses for conversion to JSON"""
     category_scores = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    score = serializers.IntegerField(default=category_score_total(), read_only=True)
 
     class Meta:
-        model = Horse
-        fields = ('id', 'name', 'score', 'owner', 'questionnaire', 'category_scores')
+        model = QuestionnaireScore
+        fields = ('id', 'name', 'owner', 'date_started', 'date_last_edited',
+                    'questionnaire', 'category_scores')
 
 class CategoryScoreSerializer(serializers.ModelSerializer):
     """Prepare CategoryScores for conversion to JSON"""
     question_scores = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
-    score = serializers.IntegerField(default=question_score_total(), read_only=True)
 
     class Meta:
         model = CategoryScore

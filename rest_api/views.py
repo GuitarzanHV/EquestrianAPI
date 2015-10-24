@@ -40,3 +40,9 @@ class QuestionnaireScoreDetail(generics.RetrieveUpdateAPIView):
     serializer_class = QuestionnaireScoreSerializer
 
 class CategoryScoreDetail(generics.RetrieveUpdateAPIView):
+    queryset = QuestionnaireScore.objects.all()
+    serializer_class = CategoryScoreSerializer
+
+class QuestionScoreDetail(generics.RetrieveUpdateAPIView):
+    queryset = QuestionScore.objects.all()
+    serializer_class = QuestionScoreSerializer
