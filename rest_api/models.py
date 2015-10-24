@@ -7,8 +7,8 @@ class Questionnaire(models.Model):
     """
     name = models.CharField(max_length=20)
     display_text = models.CharField(max_length=100)
+    acceptable_score = models.IntegerField(default=0)
     needs_work_score = models.IntegerField(default=0)
-    unacceptable_score = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -20,8 +20,8 @@ class Category(models.Model):
     """
     name = models.CharField(max_length=20)
     display_text = models.CharField(max_length=100)
+    acceptable_score = models.IntegerField(default=0)
     needs_work_score = models.IntegerField(default=0)
-    unacceptable_score = models.IntegerField(default=0)
     questionnaires = models.ManyToManyField(Questionnaire, related_name='categories')
 
     def __str__(self):
@@ -79,8 +79,19 @@ class QuestionnaireScore(models.Model):
 
         return total
 
+    def evaluation(self):
+        qnaire_score = self.score()
+
+        if qnaire_score > self.questionnaire.needs_work_score:
+            return "Unacceptable"
+
+        if qnaire_score > self.questionnaire.acceptable_score:
+            return "Needs Work"
+
+        return "Acceptable"
+
     def __str__(self):
-        return str(self.id)
+        return self.name + ' ' + str(self.id)
 
 class CategoryScore(models.Model):
     """Stores category scores, related to one QuestionnaireScore.
@@ -91,6 +102,17 @@ class CategoryScore(models.Model):
     def score(self):
         return self.question_scores.aggregate(score=Sum('score'))['score']
 
+    def evaluation(self):
+        cat_score = self.score()
+
+        if cat_score > self.category.needs_work_score:
+            return "Unacceptable"
+
+        if cat_score > self.category.acceptable_score:
+            return "Needs Work"
+
+        return "Acceptable"
+
     def __str__(self):
         return str(self.questionnaire_score) + ' ' + self.category.name
 
@@ -99,7 +121,7 @@ class QuestionScore(models.Model):
     """
     score = models.IntegerField(default=0)
     question = models.ForeignKey(Question, related_name='+')
-    answer = models.ForeignKey(Answer, related_name='+')
+    answer = models.ForeignKey(Answer, related_name='+', blank=True)
     category_score = models.ForeignKey(CategoryScore, related_name='question_scores')
 
     def __str__(self):
