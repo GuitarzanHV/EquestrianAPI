@@ -39,7 +39,7 @@ class AnswerSerializer(serializers.ModelSerializer):
     """Prepare Answers for conversion to JSON"""
     class Meta:
         model = Answer
-        fields = ('id', 'answer_text', 'score', 'questions')
+        fields = ('id', 'display_text', 'score', 'questions')
 
 class QuestionnaireScoreSerializer(serializers.ModelSerializer):
     """Prepare Horses for conversion to JSON"""
@@ -49,6 +49,7 @@ class QuestionnaireScoreSerializer(serializers.ModelSerializer):
         model = QuestionnaireScore
         fields = ('id', 'name', 'owner', 'date_started', 'date_last_edited',
                     'questionnaire', 'category_scores')
+        read_only_fields = ('date_started', 'date_last_edited')
 
     def create(self, validated_data):
         qnaire_score = QuestionnaireScore(
@@ -82,10 +83,18 @@ class CategoryScoreSerializer(serializers.ModelSerializer):
     class Meta:
         model = CategoryScore
         fields = ('id', 'score', 'evaluation', 'category', 'questionnaire_score', 'question_scores')
+        read_only_fields = ('category', 'questionnaire_score')
 
 class QuestionScoreSerializer(serializers.ModelSerializer):
     """Prepare QuestionScores for conversion to JSON"""
     class Meta:
         model = QuestionScore
-        fields = ('id', 'score', 'evaluation', 'question', 'answer', 'category_score')
+        fields = ('id', 'score', 'question', 'answer', 'category_score')
+        read_only_fields = ('score', 'question', 'category_score')
+
+    def update(self, instance, validated_data):
+        instance.answer = validated_data.get('answer', instance.answer)
+        instance.score = validated_data['answer'].score
+        instance.save()
+        return instance
         
