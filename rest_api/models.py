@@ -46,8 +46,8 @@ class Question(models.Model):
     """
     name = models.CharField(max_length=20)
     display_text = models.CharField(max_length=100)
-    image = models.FilePathField(path='/var/www/images', default="")
-    subcategories = models.ForeignKey(Subcategory, related_name='questions')
+    image = models.FilePathField(path='/var/www/images', default="", blank=True)
+    subcategory = models.ForeignKey(Subcategory, related_name='questions')
 
     def __str__(self):
         return self.name
@@ -61,7 +61,7 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, related_name='answers')
 
     def __str__(self):
-        return self.text
+        return self.display_text
 
 class QuestionnaireScore(models.Model):
     """Holds score categories for each individual questionnaire.
@@ -121,7 +121,7 @@ class QuestionScore(models.Model):
     """
     score = models.IntegerField(default=0)
     question = models.ForeignKey(Question, related_name='+')
-    answer = models.ForeignKey(Answer, related_name='+', blank=True)
+    answer = models.ForeignKey(Answer, related_name='+', blank=True, null=True)
     category_score = models.ForeignKey(CategoryScore, related_name='question_scores')
 
     def __str__(self):

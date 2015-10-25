@@ -9,7 +9,7 @@ from rest_framework.reverse import reverse
 def api_root(request, format=None):
     return Response({
         'questionnaires': reverse('questionnaire-list', request=request, format=format)
-        'questionnaire scores': reverse('questionnaire-score-list', request=request, format=format)
+        #'questionnaire scores': reverse('questionnaire-score-list', request=request, format=format)
     })
 
 class QuestionnaireList(generics.ListAPIView):
