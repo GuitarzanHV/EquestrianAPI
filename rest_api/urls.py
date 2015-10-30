@@ -40,8 +40,16 @@ urlpatterns = format_suffix_patterns([
         views.CategoryScoreDetail.as_view(),
         name='categoryscore-detail'
     ),
+    url(r'^subcategory_score/(?P<pk>[0-9]+)/$',
+        views.SubcategoryScoreDetail.as_view(),
+        name='subcategoryscore-detail'
+    ),
     url(r'^question_score/(?P<pk>[0-9]+)/$',
         views.QuestionScoreDetail.as_view(),
-        name='questionscore=detail'
+        name='questionscore-detail'
+    ),
+    url(r'^answer_score/(?P<pk>[0-9]+)/$',
+        views.AnswerScoreDetail.as_view(),
+        name='answerscore-detail'
     ),
 ])

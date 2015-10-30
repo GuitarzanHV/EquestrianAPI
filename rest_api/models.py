@@ -1,5 +1,8 @@
 from django.db import models
 from django.db.models import Sum
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.exceptions import FieldError
 
 class Questionnaire(models.Model):
     """Lists the categories for each questionnaire type, as
@@ -46,7 +49,7 @@ class Question(models.Model):
     """
     name = models.CharField(max_length=20)
     display_text = models.CharField(max_length=100)
-    image = models.FilePathField(path='/var/www/images', default="", blank=True)
+    #image = models.FilePathField(path='/var/www/images', default="", blank=True)
     subcategory = models.ForeignKey(Subcategory, related_name='questions')
 
     def __str__(self):
@@ -68,47 +71,65 @@ class QuestionnaireScore(models.Model):
         Also holds horse names, horse owner, and dates started and edited.
     """
     name = models.CharField(max_length=20)
-    owner = models.CharField(max_length=60)
+    display_text = models.CharField(max_length=100)
+    acceptable_score = models.IntegerField(default=0)
+    needs_work_score = models.IntegerField(default=0)
+    horse_name = models.CharField(max_length=20)
+    horse_owner = models.CharField(max_length=60)
     date_started = models.DateField(auto_now_add=True)
     date_last_edited = models.DateField(auto_now=True)
-    questionnaire = models.ForeignKey(Questionnaire, related_name='+') #no backwards relation
+    questionnaire = models.ForeignKey(Questionnaire, related_name='+', null=True) #no backwards relation
 
-    def score(self):
-        for cat_score in self.category_scores.all():
-            total = cat_score.score()
+    def get_score(self):
+        total = 0
+
+        for cat in self.category_scores.all():
+            total += cat.get_score()
 
         return total
 
-    def evaluation(self):
-        qnaire_score = self.score()
+    def get_evaluation(self):
+        qnaire_score = self.get_score()
 
-        if qnaire_score > self.questionnaire.needs_work_score:
+        if qnaire_score > self.needs_work_score:
             return "Unacceptable"
 
-        if qnaire_score > self.questionnaire.acceptable_score:
+        if qnaire_score > self.acceptable_score:
             return "Needs Work"
 
         return "Acceptable"
 
     def __str__(self):
-        return self.name + ' ' + str(self.id)
+        return str(self.id) + ' ' + self.name + ' ' + self.horse_name
 
 class CategoryScore(models.Model):
     """Stores category scores, related to one QuestionnaireScore.
     """
+    name = models.CharField(max_length=20)
+    display_text = models.CharField(max_length=100)
+    acceptable_score = models.IntegerField(default=0)
+    needs_work_score = models.IntegerField(default=0)
     category = models.ForeignKey(Category, related_name='+')
-    questionnaire_score = models.ForeignKey(QuestionnaireScore, related_name='category_scores')
+    questionnaire_score = models.ForeignKey(QuestionnaireScore, related_name='category_scores', null=True)
 
-    def score(self):
-        return self.question_scores.aggregate(score=Sum('score'))['score']
+    def get_score(self):
+        total = 0
 
-    def evaluation(self):
-        cat_score = self.score()
+        for subcat in self.subcategory_scores.all():
+            try:
+                total += subcat.question_scores.aggregate(score=Sum('answer.score'))['score']
+            except FieldError:
+                total += 0
 
-        if cat_score > self.category.needs_work_score:
+        return total
+
+    def get_evaluation(self):
+        cat_score = self.get_score()
+
+        if cat_score > self.needs_work_score:
             return "Unacceptable"
 
-        if cat_score > self.category.acceptable_score:
+        if cat_score > self.acceptable_score:
             return "Needs Work"
 
         return "Acceptable"
@@ -116,13 +137,86 @@ class CategoryScore(models.Model):
     def __str__(self):
         return str(self.questionnaire_score) + ' ' + self.category.name
 
+class SubcategoryScore(models.Model):
+    """
+    Stores an instance of a subcategory for scoring.
+    """
+    name = models.CharField(max_length=20)
+    display_text = models.CharField(max_length=100)
+    subcategory = models.ForeignKey(Subcategory, related_name='+', null=True)
+    category_score = models.ForeignKey(CategoryScore, related_name='subcategory_scores')
+
+    def __str__(self):
+        return str(self.category_score) + ' ' + self.subcategory.name
+
 class QuestionScore(models.Model):
     """Stores question scores, as well as chosen answer.
     """
-    score = models.IntegerField(default=0)
-    question = models.ForeignKey(Question, related_name='+')
-    answer = models.ForeignKey(Answer, related_name='+', blank=True, null=True)
-    category_score = models.ForeignKey(CategoryScore, related_name='question_scores')
+    name = models.CharField(max_length=20)
+    display_text = models.CharField(max_length=100)
+    #image = models.FilePathField(path='/var/www/images', default="", blank=True)
+    question = models.ForeignKey(Question, related_name='+', null=True)
+    answer = models.ForeignKey('AnswerScore', related_name='+', blank=True, null=True)
+    subcategory_score = models.ForeignKey(SubcategoryScore, related_name='question_scores')
 
     def __str__(self):
-        return str(self.category_score) + ' ' + self.question.name
+        return str(self.subcategory_score) + ' ' + self.question.name
+
+class AnswerScore(models.Model):
+    """
+    Stores instance of an answer for scoring
+    """
+    display_text = models.CharField(max_length=255)
+    score = models.IntegerField(default=0)
+    answer = models.ForeignKey(Answer, related_name='+', null=True)
+    question_score = models.ForeignKey(QuestionScore, related_name='answer_scores')
+
+    def __str__(self):
+        return str(self.question_score) + ' ' + str(self.answer.score)
+
+@receiver(post_save, sender=QuestionnaireScore)
+def create_questionnaire_copy(sender, instance=None, created=False, **kwargs):
+    if created:
+        instance.name = instance.questionnaire.name
+        instance.display_text = instance.questionnaire.display_text
+        instance.acceptable_score = instance.questionnaire.acceptable_score
+        instance.needs_work_score = instance.questionnaire.needs_work_score
+
+        for category in instance.questionnaire.categories.all():
+            cat_score = CategoryScore(
+                category=category,
+                questionnaire_score=instance
+            )
+            cat_score.name = cat_score.category.name
+            cat_score.display_text = cat_score.category.display_text
+            cat_score.acceptable_score = cat_score.category.acceptable_score
+            cat_score.needs_work_score = cat_score.category.needs_work_score
+            cat_score.save()
+
+            for subcategory in cat_score.category.subcategories.all():
+                subcat_score = SubcategoryScore(
+                    subcategory=subcategory,
+                    category_score=cat_score
+                )
+                subcat_score.name = subcat_score.subcategory.name
+                subcat_score.display_text = subcat_score.subcategory.display_text
+                subcat_score.save()
+
+                for question in subcategory.questions.all():
+                    q_score = QuestionScore(
+                        question=question,
+                        subcategory_score=subcat_score
+                    )
+                    q_score.name = q_score.question.name
+                    q_score.display_text = q_score.question.display_text
+                    #q_score.image = q_score.question.image
+                    q_score.save()
+
+                    for answer in question.answers.all():
+                        a_score = AnswerScore(
+                            answer=answer,
+                            question_score=q_score
+                        )
+                        a_score.display_text = a_score.answer.display_text
+                        a_score.score = a_score.answer.score
+                        a_score.save()

@@ -8,8 +8,8 @@ from rest_framework.reverse import reverse
 @api_view(('GET',))
 def api_root(request, format=None):
     return Response({
-        'questionnaires': reverse('questionnaire-list', request=request, format=format)
-        #'questionnaire scores': reverse('questionnaire-score-list', request=request, format=format)
+        'questionnaires': reverse('questionnaire-list', request=request, format=format),
+        'questionnaire scores': reverse('questionnairescore-list', request=request, format=format)
     })
 
 class QuestionnaireList(generics.ListAPIView):
@@ -45,9 +45,17 @@ class QuestionnaireScoreDetail(generics.RetrieveUpdateAPIView):
     serializer_class = QuestionnaireScoreSerializer
 
 class CategoryScoreDetail(generics.RetrieveAPIView):
-    queryset = QuestionnaireScore.objects.all()
+    queryset = CategoryScore.objects.all()
     serializer_class = CategoryScoreSerializer
+
+class SubcategoryScoreDetail(generics.RetrieveAPIView):
+    queryset = SubcategoryScore.objects.all()
+    serializer_class = SubcategoryScoreSerializer
 
 class QuestionScoreDetail(generics.RetrieveUpdateAPIView):
     queryset = QuestionScore.objects.all()
     serializer_class = QuestionScoreSerializer
+
+class AnswerScoreDetail(generics.RetrieveAPIView):
+    queryset = AnswerScore.objects.all()
+    serializer_class = AnswerScoreSerializer
