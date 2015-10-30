@@ -64,7 +64,7 @@ class QuestionnaireScoreSerializer(serializers.ModelSerializer):
                 category=category,
                 questionnaire_score=qnaire_score
             )
-            cat_score.save()
+            cat_score.save()http://cs3060.bgsu.edu/equestrian-1002/Equestrian_API/blob/master/rest_api/models.py
 
             for subcategory in cat_score.category.subcategories.all():
                 for question in subcategory.questions.all():
@@ -97,4 +97,15 @@ class QuestionScoreSerializer(serializers.ModelSerializer):
         instance.score = validated_data['answer'].score
         instance.save()
         return instance
+
+class DefinitionSerializer(serializers.ModelSerializer):
+"""Prepare Definitons for JSON
+"""
+	Definition = serializers.PrimaryKeyRelatedField(many=true, read_only=true);
+
+	class Meta:
+	model= Definition
+	fields = ("definition_id", "display_word_text","display_definition_text")
+
+	return Definition
         

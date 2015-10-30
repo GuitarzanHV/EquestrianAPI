@@ -18,6 +18,7 @@ class Category(models.Model):
     as maximum score for each score type. Many to Many 
     relationships with Subcategory and Questionnaire.
     """
+    
     name = models.CharField(max_length=20)
     display_text = models.CharField(max_length=100)
     acceptable_score = models.IntegerField(default=0)
@@ -126,3 +127,18 @@ class QuestionScore(models.Model):
 
     def __str__(self):
         return str(self.category_score) + ' ' + self.question.name
+
+
+
+
+class Definition(models.Model):
+
+"""Stores the definitions for the glossary section. 
+"""
+	definition_id = models.IntegerField(default=0)
+	display_word_text = models.charField(max_length=20)
+	display_definition_text = models.CharField(max_length=600)
+
+def __str__(self):
+	return self.Definition
+
