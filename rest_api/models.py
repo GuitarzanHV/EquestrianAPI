@@ -173,7 +173,6 @@ class AnswerScore(models.Model):
     question_score = models.ForeignKey(QuestionScore, related_name='answer_scores')
 
     def __str__(self):
-<<<<<<< HEAD
         return str(self.category_score) + ' ' + self.question.name
 
 
@@ -225,16 +224,15 @@ def create_questionnaire_copy(sender, instance=None, created=False, **kwargs):
                         a_score.display_text = a_score.answer.display_text
                         a_score.score = a_score.answer.score
                         a_score.save()
->>>>>>> 2bc44c7d954ed8ec03328a40e73cf136bd6b8a2b
 
 class Definition(models.Model):
 
 """Stores the definitions for the glossary section. 
 """
-        definition_id = models.IntegerField(default=0)
-        display_word_text = models.charField(max_length=20)
-        display_definition_text = models.CharField(max_length=600)
+    definition_id = models.IntegerField(default=0)
+    display_word_text = models.charField(max_length=20)
+    display_definition_text = models.CharField(max_length=600)
 
 def __str__(self):
-        return self.Definition
+    return self.Definition
 

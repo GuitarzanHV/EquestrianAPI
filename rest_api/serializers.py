@@ -50,7 +50,6 @@ class QuestionnaireScoreSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'horse_name', 'horse_owner', 'date_started', 'date_last_edited',
                     'name', 'display_text', 'acceptable_score', 'needs_work_score', 
                     'questionnaire', 'category_scores')
-<<<<<<< HEAD
         read_only_fields = ('date_started', 'date_last_edited')
 
     def create(self, validated_data):
@@ -79,13 +78,11 @@ class QuestionnaireScoreSerializer(serializers.HyperlinkedModelSerializer):
         return qnaire_score
 
 class CategoryScoreSerializer(serializers.ModelSerializer):
-=======
         read_only_fields = ('date_started', 'date_last_edited', 'name', 
                                 'display_text', 'acceptable_score', 
                                 'needs_work_score',)
 
 class CategoryScoreSerializer(serializers.HyperlinkedModelSerializer):
->>>>>>> 2bc44c7d954ed8ec03328a40e73cf136bd6b8a2b
     """Prepare CategoryScores for conversion to JSON"""
     subcategory_scores = serializers.HyperlinkedRelatedField(view_name='subcategoryscore-detail', many=True, read_only=True)
     score = serializers.IntegerField(source='get_score', read_only=True)
@@ -110,7 +107,6 @@ class QuestionScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = QuestionScore
-<<<<<<< HEAD
         fields = ('id', 'score', 'question', 'answer', 'category_score')
         read_only_fields = ('score', 'question', 'category_score')
 
@@ -134,12 +130,9 @@ class AnswerScoreSerializer(serializers.HyperlinkedModelSerializer):
 class DefinitionSerializer(serializers.ModelSerializer):
 """Prepare Definitons for JSON
 """
-        Definition = serializers.PrimaryKeyRelatedField(many=true, read_only=true)
+       Definition = serializers.PrimaryKeyRelatedField(many=true, read_only=true)
 
-        class Meta:
+    class Meta:
         model= Definition
         fields = ("definition_id", "display_word_text","display_definition_text")
 
-
-
->>>>>>> 2bc44c7d954ed8ec03328a40e73cf136bd6b8a2b
