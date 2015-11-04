@@ -52,30 +52,6 @@ class QuestionnaireScoreSerializer(serializers.HyperlinkedModelSerializer):
                     'questionnaire', 'category_scores')
         read_only_fields = ('date_started', 'date_last_edited')
 
-    def create(self, validated_data):
-        qnaire_score = QuestionnaireScore(
-            name=validated_data['name'],
-            owner=validated_data['owner'],
-            questionnaire=validated_data['questionnaire']
-        )
-        qnaire_score.save()
-
-        for category in qnaire_score.questionnaire.categories.all():
-            cat_score = CategoryScore(
-                category=category,
-                questionnaire_score=qnaire_score
-            )
-            cat_score.save()http://cs3060.bgsu.edu/equestrian-1002/Equestrian_API/blob/master/rest_api/models.py
-
-            for subcategory in cat_score.category.subcategories.all():
-                for question in subcategory.questions.all():
-                    q_score = QuestionScore(
-                        question=question,
-                        category_score=cat_score
-                    )
-                    q_score.save()
-
-        return qnaire_score
 
 class CategoryScoreSerializer(serializers.ModelSerializer):
         read_only_fields = ('date_started', 'date_last_edited', 'name', 
@@ -109,18 +85,6 @@ class QuestionScoreSerializer(serializers.HyperlinkedModelSerializer):
         model = QuestionScore
         fields = ('id', 'score', 'question', 'answer', 'category_score')
         read_only_fields = ('score', 'question', 'category_score')
-
-    def update(self, instance, validated_data):
-        instance.answer = validated_data.get('answer', instance.answer)
-        instance.score = validated_data['answer'].score
-        instance.save()
-        return instance
-
-
-        
-        fields = ('url', 'name', 'display_text', 'question', 'answer', 'subcategory_score', 
-                    'answer_scores')
-        read_only_fields = ('question', 'subcategory_score', 'name', 'display_text', 'image')
 
 class AnswerScoreSerializer(serializers.HyperlinkedModelSerializer):
     
