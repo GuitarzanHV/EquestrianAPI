@@ -10,6 +10,7 @@ class Questionnaire(models.Model):
     """
     name = models.CharField(max_length=20)
     display_text = models.CharField(max_length=100)
+    mobile = models.BooleanField(default=True)
     acceptable_score = models.IntegerField(default=0)
     needs_work_score = models.IntegerField(default=0)
 
