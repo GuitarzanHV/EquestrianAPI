@@ -59,3 +59,7 @@ class QuestionScoreDetail(generics.RetrieveUpdateAPIView):
 class AnswerScoreDetail(generics.RetrieveAPIView):
     queryset = AnswerScore.objects.all()
     serializer_class = AnswerScoreSerializer
+
+class DefinitionDetail(generics.RetrieveAPIView):
+    queryset = Definition.objects.all()
+    serializer_class = DefinitionSerializer

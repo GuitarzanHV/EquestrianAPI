@@ -22,6 +22,7 @@ class Category(models.Model):
     as maximum score for each score type. Many to Many 
     relationships with Subcategory and Questionnaire.
     """
+    
     name = models.CharField(max_length=20)
     display_text = models.CharField(max_length=100)
     acceptable_score = models.IntegerField(default=0)
@@ -173,7 +174,10 @@ class AnswerScore(models.Model):
     question_score = models.ForeignKey(QuestionScore, related_name='answer_scores')
 
     def __str__(self):
-        return str(self.question_score) + ' ' + str(self.answer.score)
+        return str(self.category_score) + ' ' + self.question.name
+
+
+return str(self.question_score) + ' ' + str(self.answer.score)
 
 @receiver(post_save, sender=QuestionnaireScore)
 def create_questionnaire_copy(sender, instance=None, created=False, **kwargs):
@@ -221,3 +225,15 @@ def create_questionnaire_copy(sender, instance=None, created=False, **kwargs):
                         a_score.display_text = a_score.answer.display_text
                         a_score.score = a_score.answer.score
                         a_score.save()
+
+class Definition(models.Model):
+
+"""Stores the definitions for the glossary section. 
+"""
+    definition_id = models.IntegerField(default=0)
+    display_word_text = models.charField(max_length=20)
+    display_definition_text = models.CharField(max_length=600)
+
+def __str__(self):
+    return self.Definition
+

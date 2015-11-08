@@ -50,6 +50,10 @@ class QuestionnaireScoreSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'horse_name', 'horse_owner', 'date_started', 'date_last_edited',
                     'name', 'display_text', 'acceptable_score', 'needs_work_score', 
                     'questionnaire', 'category_scores')
+        read_only_fields = ('date_started', 'date_last_edited')
+
+
+class CategoryScoreSerializer(serializers.ModelSerializer):
         read_only_fields = ('date_started', 'date_last_edited', 'name', 
                                 'display_text', 'acceptable_score', 
                                 'needs_work_score',)
@@ -79,12 +83,20 @@ class QuestionScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = QuestionScore
-        fields = ('url', 'name', 'display_text', 'question', 'answer', 'subcategory_score', 
-                    'answer_scores')
-        read_only_fields = ('question', 'subcategory_score', 'name', 'display_text', 'image')
+        fields = ('id', 'score', 'question', 'answer', 'category_score')
+        read_only_fields = ('score', 'question', 'category_score')
 
 class AnswerScoreSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = AnswerScore
         fields = ('url', 'display_text', 'score', 'answer', 'question_score')
+class DefinitionSerializer(serializers.ModelSerializer):
+"""Prepare Definitons for JSON
+"""
+       Definition = serializers.PrimaryKeyRelatedField(many=true, read_only=true)
+
+    class Meta:
+        model= Definition
+        fields = ("definition_id", "display_word_text","display_definition_text")
+
