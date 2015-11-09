@@ -52,4 +52,8 @@ urlpatterns = format_suffix_patterns([
         views.AnswerScoreDetail.as_view(),
         name='answerscore-detail'
     ),
+    url(r'^definition/(?P<pk>[0-9]+)/$',
+    views.DefinitionDetail.as_view(),
+    name='definition-detail'
+    ),
 ])
