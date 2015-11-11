@@ -53,7 +53,7 @@ urlpatterns = format_suffix_patterns([
         name='answerscore-detail'
     ),
     url(r'^definition/(?P<pk>[0-9]+)/$',
-    views.DefinitionDetail.as_view(),
-    name='definition-detail'
+        views.DefinitionDetail.as_view(),
+        name='definition-detail'
     ),
 ])
