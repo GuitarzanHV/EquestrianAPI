@@ -1,5 +1,15 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers 
 from .models import *
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    questionnaire_scores = serializers.HyperlinkedRelatedField(view_name='questionnairescore-detail', many=True, read_only=True)
+
+    class Meta:
+        model = User
+        fields = ('url', 'username', 'questionnaire_scores')
+
 
 class QuestionnaireSerializer(serializers.ModelSerializer):
     """Prepare Questionnaires for conversion to JSON"""
@@ -40,14 +50,14 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        fields = ('id', 'name', 'display_text', 'subcategories', 'answers')
+        fields = ('id', 'name', 'display_text', 'subcategory', 'answers')
 
 
 class AnswerSerializer(serializers.ModelSerializer):
     """Prepare Answers for conversion to JSON"""
     class Meta:
         model = Answer
-        fields = ('id', 'display_text', 'score', 'questions')
+        fields = ('id', 'display_text', 'score', 'question')
 
 
 class QuestionnaireScoreSerializer(serializers.HyperlinkedModelSerializer):

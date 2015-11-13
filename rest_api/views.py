@@ -1,9 +1,10 @@
-from .models import *
-from .serializers import *
+from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from .models import *
+from .serializers import *
 
 
 @api_view(('GET',))
@@ -12,6 +13,18 @@ def api_root(request, format=None):
         'questionnaires': reverse('questionnaire-list', request=request, format=format),
         'questionnaire scores': reverse('questionnairescore-list', request=request, format=format)
     })
+
+
+class UserList(generics.ListCreateAPIView):
+    "List and create user logins"
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    "Get details of a user login"
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 
 
 class QuestionnaireList(generics.ListAPIView):

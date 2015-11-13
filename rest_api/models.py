@@ -86,6 +86,7 @@ class QuestionnaireScore(models.Model):
     horse_name = models.CharField(max_length=20)
     horse_owner = models.CharField(max_length=60)
     location = models.CharField(max_length=100)
+    owner = models.ForeignKey('auth.User', related_name='questionnaire_scores', null=True, blank=True)
     date_started = models.DateField(auto_now_add=True)
     date_last_edited = models.DateField(auto_now=True)
     questionnaire = models.ForeignKey(Questionnaire, related_name='+', null=True) #no backwards relation
