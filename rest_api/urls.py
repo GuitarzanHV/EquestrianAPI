@@ -4,6 +4,14 @@ from rest_api import views
 
 urlpatterns = format_suffix_patterns([
     url(r'^$', views.api_root),
+    url(r'^user/$',
+        views.UserList.as_view(),
+        name='user-list'
+    ),
+    url(r'^user/?P<pk>[0-9]+/$',
+        views.UserDetail.as_view(),
+        name='user-detail'
+    ),
     url(r'^questionnaire/$', 
         views.QuestionnaireList.as_view(), 
         name='questionnaire-list'
@@ -51,5 +59,9 @@ urlpatterns = format_suffix_patterns([
     url(r'^answer_score/(?P<pk>[0-9]+)/$',
         views.AnswerScoreDetail.as_view(),
         name='answerscore-detail'
+    ),
+    url(r'^definition/(?P<pk>[0-9]+)/$',
+        views.DefinitionDetail.as_view(),
+        name='definition-detail'
     ),
 ])
