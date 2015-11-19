@@ -63,17 +63,19 @@ class AnswerSerializer(serializers.ModelSerializer):
 class QuestionnaireScoreSerializer(serializers.HyperlinkedModelSerializer):
     """Prepare QuestionnaireScores for conversion to JSON and back"""
     category_scores = serializers.HyperlinkedRelatedField(view_name='categoryscore-detail', many=True, read_only=True)
+    questionnaire = serializers.HyperlinkedRelatedField(queryset=Questionnaire.objects.all(), view_name='questionnaire-detail')
 
     class Meta:
         model = QuestionnaireScore
         fields = ('url', 'horse_name', 'horse_owner', 
             'location', 'score', 'evaluation', 'date_started', 
             'date_last_edited', 'name', 'display_text', 
-            'acceptable_score', 'needs_work_score', 'questionnaire', 
-            'category_scores'
+            'riding_style', 'acceptable_score', 'needs_work_score', 
+            'questionnaire', 'category_scores'
             )
-        read_only_fields = ('name', 'display_text', 'acceptable_score', 
-            'needs_work_score', 'date_started', 'date_last_edited'
+        read_only_fields = ('name', 'display_text', 'riding_style',
+            'acceptable_score', 'needs_work_score', 'date_started', 
+            'date_last_edited'
             )
 
     def create(self, validated_data):
@@ -88,6 +90,7 @@ class QuestionnaireScoreSerializer(serializers.HyperlinkedModelSerializer):
         qnaire_score.acceptable_score = qnaire_score.questionnaire.acceptable_score
         qnaire_score.needs_work_score = qnaire_score.questionnaire.needs_work_score
         qnaire_score.mobile = qnaire_score.questionnaire.mobile
+        qnaire_score.riding_style = qnaire_score.questionnaire.riding_style
         qnaire_score.save()
 
         for category in qnaire_score.questionnaire.categories.all():
