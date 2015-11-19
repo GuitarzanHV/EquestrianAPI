@@ -1,7 +1,5 @@
 from django.db import models
 from django.db.models import Sum
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.core.exceptions import FieldError
 
 
@@ -9,9 +7,17 @@ class Questionnaire(models.Model):
     """Lists the categories for each questionnaire type, as
     well as the maximum composite score for each score type
     """
+    WESTERN = 'west'
+    ENGLISH = 'engl'
+    RIDING_STYLE_CHOICES = (
+        (WESTERN, 'Western'),
+        (ENGLISH, 'English')
+    )
+
     name = models.CharField(max_length=20)
     display_text = models.CharField(max_length=100)
     mobile = models.BooleanField(default=True)
+    riding_style = models.CharField(max_length=4, choices=RIDING_STYLE_CHOICES)
     acceptable_score = models.IntegerField(default=0)
     needs_work_score = models.IntegerField(default=0)
 
@@ -81,12 +87,13 @@ class QuestionnaireScore(models.Model):
     name = models.CharField(max_length=20)
     display_text = models.CharField(max_length=100)
     mobile = models.BooleanField(default=True)
+    riding_style = models.CharField(max_length=4)
     acceptable_score = models.IntegerField(default=0)
     needs_work_score = models.IntegerField(default=0)
     horse_name = models.CharField(max_length=20)
     horse_owner = models.CharField(max_length=60)
     location = models.CharField(max_length=100)
-    owner = models.ForeignKey('auth.User', related_name='questionnaire_scores', null=True, blank=True)
+    #owner = models.ForeignKey('auth.User', related_name='questionnaire_scores')
     date_started = models.DateField(auto_now_add=True)
     date_last_edited = models.DateField(auto_now=True)
     questionnaire = models.ForeignKey(Questionnaire, related_name='+', null=True) #no backwards relation
@@ -120,8 +127,8 @@ class CategoryScore(models.Model):
     display_text = models.CharField(max_length=100)
     acceptable_score = models.IntegerField(default=0)
     needs_work_score = models.IntegerField(default=0)
-    category = models.ForeignKey(Category, related_name='+')
-    questionnaire_score = models.ForeignKey(QuestionnaireScore, related_name='category_scores', null=True)
+    category = models.ForeignKey(Category, related_name='+', null=True)
+    questionnaire_score = models.ForeignKey(QuestionnaireScore, related_name='category_scores')
 
     def score(self):
         total = 0
