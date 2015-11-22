@@ -44,6 +44,14 @@ urlpatterns = format_suffix_patterns([
         views.QuestionnaireScoreDetail.as_view(),
         name='questionnairescore-detail'
     ),
+    url(r'^questionnaire_score_nested/$',
+        views.QuestionnaireScoreNestedCreate.as_view(),
+        name='questionnairescorenested-create'
+    ),
+    url(r'^questionnaire_score_nested/(?P<pk>[0-9]+)/$',
+        views.QuestionnaireScoreNestedDetail.as_view(),
+        name='questionnairescorenested-detail'
+    ),
     url(r'^category_score/(?P<pk>[0-9]+)/$',
         views.CategoryScoreDetail.as_view(),
         name='categoryscore-detail'
