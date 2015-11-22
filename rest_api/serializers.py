@@ -18,8 +18,9 @@ class QuestionnaireSerializer(serializers.ModelSerializer):
     class Meta:
         model = Questionnaire
         fields = (
-            'id', 'name', 'display_text', 'mobile', 
-            'acceptable_score', 'needs_work_score', 'categories'
+            'id', 'name', 'display_text',
+            'mobile', 'riding_style', 'acceptable_score',
+            'needs_work_score', 'categories'
             )
 
 
@@ -179,6 +180,8 @@ class AnswerScoreSerializer(serializers.HyperlinkedModelSerializer):
 
 class QuestionnaireScoreNestedSerializer(serializers.ModelSerializer):
     """Nested serializer for uploading QuestionnaireScores from mobile"""
+    category_scores = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+
     class Meta:
         model = QuestionnaireScore
         depth = 5
