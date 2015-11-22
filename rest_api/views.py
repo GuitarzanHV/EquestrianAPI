@@ -115,6 +115,12 @@ class AnswerScoreDetail(generics.RetrieveAPIView):
     serializer_class = AnswerScoreSerializer
 
 
+class DefinitionList(generics.ListAPIView):
+    "List of definitions in the database"
+    queryset = Definition.objects.all()
+    serializer_class = DefinitionSerializer
+
+
 class DefinitionDetail(generics.RetrieveAPIView):
     "Provides definitions of a word in the database"
     queryset = Definition.objects.all()
