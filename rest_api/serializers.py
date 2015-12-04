@@ -4,6 +4,7 @@ from .models import *
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    "Serialize django User class for OAuth and login"
     questionnaire_scores = serializers.HyperlinkedRelatedField(view_name='questionnairescore-detail', many=True, read_only=True)
 
     class Meta:
@@ -11,6 +12,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'username', 'questionnaire_scores')
 
 
+#Questionnaire tree serializers. Used by the mobile versions for uploading raw data.
 class QuestionnaireSerializer(serializers.ModelSerializer):
     """Prepare Questionnaires for conversion to JSON"""
     categories = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
@@ -61,6 +63,7 @@ class AnswerSerializer(serializers.ModelSerializer):
         fields = ('id', 'display_text', 'score', 'question')
 
 
+#QuestionnaireScore tree serializers. Used by the website for displaying and saving scores
 class QuestionnaireScoreSerializer(serializers.HyperlinkedModelSerializer):
     """Prepare QuestionnaireScores for conversion to JSON and back"""
     category_scores = serializers.HyperlinkedRelatedField(view_name='categoryscore-detail', many=True, read_only=True)
@@ -147,9 +150,6 @@ class CategoryScoreSerializer(serializers.HyperlinkedModelSerializer):
             'evaluation', 'category', 'questionnaire_score', 
             'subcategory_scores'
             )
-        read_only_fields = ('date_started', 'date_last_edited', 'name', 
-            'display_text', 'acceptable_score', 'needs_work_score',
-            )
 
 
 class SubcategoryScoreSerializer(serializers.HyperlinkedModelSerializer):
@@ -158,7 +158,7 @@ class SubcategoryScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = SubcategoryScore
-        fields = ('url', 'name', 'display_text', 'subcategory', 'question_scores')
+        fields = ('url', 'name', 'display_text', 'subcategory', 'category_score', 'question_scores')
 
 
 class QuestionScoreSerializer(serializers.HyperlinkedModelSerializer):
@@ -167,8 +167,11 @@ class QuestionScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = QuestionScore
-        fields = ('url', 'question', 'answer', 'subcategory_score', 'answer_scores')
-        read_only_fields = ('question', 'subcategory_score', 'answer_scores')
+        fields = ('url', 'name', 'display_text', 
+            'question', 'answer', 'subcategory_score', 
+            'answer_scores'
+            )
+        read_only_fields = ('name', 'display_text', 'question', 'subcategory_score', 'answer_scores')
 
 
 class AnswerScoreSerializer(serializers.HyperlinkedModelSerializer):
@@ -178,15 +181,87 @@ class AnswerScoreSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url', 'display_text', 'score', 'answer', 'question_score')
 
 
+#Nested QuestionnaireScore serializers. For mobile platforms to upload completed forms.
+class AnswerScoreNestedSerializer(serializers.ModelSerializer):
+    "Nested AnswerScore serializer for nested views"
+    class Meta:
+        model = AnswerScore
+        fields = ('pk', 'display_text', 'score', 'answer', 'question_score')
+
+
+class QuestionScoreNestedSerializer(serializers.ModelSerializer):
+    """Nested QuestionScore serializer for nested views"""
+    answer_scores = AnswerScoreNestedSerializer(many=True)
+
+    class Meta:
+        model = QuestionScore
+        fields = ('pk', 'name', 'display_text',
+            'question', 'answer', 'subcategory_score', 
+            'answer_scores'
+            )
+
+
+class SubcategoryScoreNestedSerializer(serializers.ModelSerializer):
+    """Nested SubcategoryScore serializer for nested views"""
+    question_scores = QuestionScoreNestedSerializer(many=True)
+
+    class Meta:
+        model = SubcategoryScore
+        fields = ('pk', 'name', 'display_text', 'subcategory', 'category_score', 'question_scores')
+
+
+class CategoryScoreNestedSerializer(serializers.ModelSerializer):
+    """Nested CategoryScore Serializer for nested views"""
+    subcategory_scores = SubcategoryScoreNestedSerializer(many=True)
+
+    class Meta:
+        model = CategoryScore
+        fields = ('pk', 'name', 'display_text', 
+            'acceptable_score', 'needs_work_score', 'score', 
+            'evaluation', 'category', 'questionnaire_score', 
+            'subcategory_scores'
+            )
+
+
 class QuestionnaireScoreNestedSerializer(serializers.ModelSerializer):
     """Nested serializer for uploading QuestionnaireScores from mobile"""
-    category_scores = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    category_scores = CategoryScoreNestedSerializer(many=True)
 
     class Meta:
         model = QuestionnaireScore
         depth = 5
 
+    def create(self, validated_data):
+        categories_data = validated_data.pop('category_scores')
+        qnaire_score = QuestionnaireScore.objects.create(**validated_data)
 
+        for category_data in categories_data:
+            subcategories_data = category_data.pop('subcategory_scores')
+            category_data.pop('questionnaire_score')
+            category_score = CategoryScore.objects.create(questionnaire_score=qnaire_score, **category_data)
+
+            for subcategory_data in subcategories_data:
+                questions_data = subcategory_data.pop('question_scores')
+                subcategory_data.pop('category_score')
+                subcategory_score = SubcategoryScore.objects.create(category_score=category_score, **subcategory_data)
+
+                for question_data in questions_data:
+                    answers_data = question_data.pop('answer_scores')
+                    question_answer_data = question_data.pop('answer')
+                    question_data.pop('subcategory_score')
+                    question_score = QuestionScore.objects.create(subcategory_score=subcategory_score, **question_data)
+
+                    for answer_data in answers_data:
+                        answer_data.pop('question_score')
+                        AnswerScore.objects.create(question_score=question_score, **answer_data)
+
+                    question_score.answer = AnswerScore.objects.get(question_score=question_score, answer=question_answer_data.answer)
+                    question_score.save()
+
+        return qnaire_score
+
+
+#Definitions
 class DefinitionSerializer(serializers.ModelSerializer):
     """Prepare Definitons for JSON"""
     class Meta:

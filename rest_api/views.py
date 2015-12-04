@@ -11,7 +11,8 @@ from .serializers import *
 def api_root(request, format=None):
     return Response({
         'questionnaires': reverse('questionnaire-list', request=request, format=format),
-        'questionnaire scores': reverse('questionnairescore-list', request=request, format=format)
+        'questionnaire scores': reverse('questionnairescore-list', request=request, format=format),
+        'mobile upload': reverse('questionnairescorenested-create', request=request, format=format)
     })
 
 

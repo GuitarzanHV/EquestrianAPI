@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Sum
 from django.core.exceptions import FieldError
+from datetime import date
 
 
 class Questionnaire(models.Model):
@@ -94,7 +95,7 @@ class QuestionnaireScore(models.Model):
     horse_owner = models.CharField(max_length=60)
     location = models.CharField(max_length=100)
     #owner = models.ForeignKey('auth.User', related_name='questionnaire_scores')
-    date_started = models.DateField(auto_now_add=True)
+    date_started = models.DateField(default=date.today())
     date_last_edited = models.DateField(auto_now=True)
     questionnaire = models.ForeignKey(Questionnaire, related_name='+', null=True) #no backwards relation
 
