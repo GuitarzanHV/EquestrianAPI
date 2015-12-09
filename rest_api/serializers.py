@@ -164,14 +164,20 @@ class SubcategoryScoreSerializer(serializers.HyperlinkedModelSerializer):
 class QuestionScoreSerializer(serializers.HyperlinkedModelSerializer):
     """Prepare QuestionScores for conversion to JSON"""
     answer_scores = serializers.HyperlinkedRelatedField(view_name='answerscore-detail', many=True, read_only=True)
+    id = serializers.HiddenField(default='0')
 
     class Meta:
         model = QuestionScore
         fields = ('url', 'name', 'display_text', 
             'question', 'answer', 'subcategory_score', 
-            'answer_scores'
+            'answer_scores', 'id'
             )
         read_only_fields = ('name', 'display_text', 'question', 'subcategory_score', 'answer_scores')
+
+    def __init__(self, *args, **kwargs):
+        super(QuestionScoreSerializer, self).__init__(*args, **kwargs)
+        #print(str(self.fields['id'].get_attribute(self.instance)))
+        self.fields['answer'].queryset = AnswerScore.objects.filter(question_score__pk=self.fields['id'].get_attribute(self.instance))
 
 
 class AnswerScoreSerializer(serializers.HyperlinkedModelSerializer):
