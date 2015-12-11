@@ -48,3 +48,4 @@ Notes
 
 While production_settings.py is provided here for convenience, it should NOT be used for development or shared with the outside world. The information in it can lead to security breaches.
 While not implemented currently, the SECRET_KEY should be set in production_settings.py for real-world deployment. For more information, visit the [Django Deployment Checklist](https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/)
+To log into the admin for the first time, create a superuser using the command `python3 manage.py createsuperuser`
