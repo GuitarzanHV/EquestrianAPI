@@ -3,13 +3,13 @@ from rest_framework import serializers
 from .models import *
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    "Serialize django User class for OAuth and login"
-    questionnaire_scores = serializers.HyperlinkedRelatedField(view_name='questionnairescore-detail', many=True, read_only=True)
+# class UserSerializer(serializers.HyperlinkedModelSerializer):
+#     "Serialize django User class for OAuth and login"
+#     questionnaire_scores = serializers.HyperlinkedRelatedField(view_name='questionnairescore-detail', many=True, read_only=True)
 
-    class Meta:
-        model = User
-        fields = ('url', 'username', 'questionnaire_scores')
+#     class Meta:
+#         model = User
+#         fields = ('url', 'username', 'questionnaire_scores')
 
 
 #Questionnaire tree serializers. Used by the mobile versions for uploading raw data.
@@ -176,8 +176,7 @@ class QuestionScoreSerializer(serializers.HyperlinkedModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super(QuestionScoreSerializer, self).__init__(*args, **kwargs)
-        #print(str(self.fields['id'].get_attribute(self.instance)))
-        self.fields['answer'].queryset = AnswerScore.objects.filter(question_score__pk=self.fields['id'].get_attribute(self.instance))
+        self.fields['answer'].queryset = AnswerScore.objects.filter(question_score__pk=self.instance.id)
 
 
 class AnswerScoreSerializer(serializers.HyperlinkedModelSerializer):
