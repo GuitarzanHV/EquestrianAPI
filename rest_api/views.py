@@ -16,16 +16,16 @@ def api_root(request, format=None):
     })
 
 
-class UserList(generics.ListCreateAPIView):
-    "List and create user logins"
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UserList(generics.ListCreateAPIView):
+#     "List and create user logins"
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
 
-class UserDetail(generics.RetrieveAPIView):
-    "Get details of a user login"
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+# class UserDetail(generics.RetrieveAPIView):
+#     "Get details of a user login"
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
 
 
 class QuestionnaireList(generics.ListAPIView):
